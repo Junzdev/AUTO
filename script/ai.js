@@ -1,33 +1,43 @@
-const axios = require('axios');
 module.exports.config = {
   name: 'ai',
-  version: '1.0.0',
-  role: 0,
-  hasPrefix: false,
-  aliases: ['gpt', 'openai'],
-  description: "An AI command powered by GPT-4",
-  usage: "Ai [promot]",
-  credits: 'Developer',
-  cooldown: 3,
+  version: '1.0.1', 
 };
-module.exports.run = async function({
-  api,
-  event,
-  args
-}) {
-  const input = args.join(' ');
-  if (!input) {
-    api.sendMessage(`Please provide a question or statement after 'ai'. For example: 'ai What is the capital of France?'`, event.threadID, event.messageID);
-    return;
-  }
-  api.sendMessage(`🔍 "${input}"`, event.threadID, event.messageID);
+
+module.exports.run = async function ({ api, event, args }) {
+  const { threadID, messageID, senderID } = event;
+  const prompt = args.join(" ");
+  const axios = require("axios");
   try {
-    const {
-      data
-    } = await axios.get(`https://soyeon-api.onrender.com/api?prompt=${encodeURIComponent(input)}`);
-    const response = data.response;
-    api.sendMessage(response + '\n\nhttps://bit.ly/create-chatbot-me', event.threadID, event.messageID);
+    const info = await api.getUserInfo(senderID);
+    const name = info[senderID].name;
+    const r = await axios.post("https://jn-ai.onrender.com/ai", {
+params: {
+      prompt,
+      apikey: "jnKey-W1RLIQnZ5Z", 
+      name,
+      id: senderID
+}
+    });
+const av = r.data.av; 
+    const result = r.data.result.replace(/{pn}/g, "ai");
+    let attachments = [];
+    if (av) {
+      if (Array.isArray(av)) {
+   const image = av.map(async url => {
+          const re = await axios.get(url, { responseType: 'stream' });
+   re.data.path = `${Date.now()}-${url.split('/').pop()}`; 
+   return re.data;
+        });
+        attachments = await Promise.all(image);
+      } else {
+        const imageRes = await axios.get(av, { responseType: 'stream' });
+       imageRes.data.path = `${Date.now()}.png`;
+        attachments = [imageRes.data]; 
+      }
+    }   
+    api.sendMessage({ body: result, attachment: attachments }, threadID, messageID);
   } catch (error) {
-    api.sendMessage('An error occurred while processing your request.', event.threadID, event.messageID);
+    console.error("Error in AI module:", error); 
+    api.sendMessage("something went wrong", threadID); 
   }
 };

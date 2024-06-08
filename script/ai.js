@@ -1,22 +1,21 @@
+const axios = require("axios");
 module.exports.config = {
   name: 'ai',
   version: '1.0.1', 
 };
 
 module.exports.run = async function ({ api, event, args }) {
-  const { threadID, messageID, senderID } = event;
+  const { threadID, messageID, senderID: id } = event;
   const prompt = args.join(" ");
   const axios = require("axios");
   try {
-    const info = await api.getUserInfo(senderID);
-    const name = info[senderID].name;
+    const info = await api.getUserInfo(id);
+    const name = info[id].name;
     const r = await axios.post("https://jn-ai.onrender.com/ai", {
-params: {
-      prompt,
+     prompt,
       apikey: "jnKey-W1RLIQnZ5Z", 
       name,
-      id: senderID
-}
+      id
     });
 const av = r.data.av; 
     const result = r.data.result.replace(/{pn}/g, "ai");
@@ -24,7 +23,7 @@ const av = r.data.av;
     if (av) {
       if (Array.isArray(av)) {
    const image = av.map(async url => {
-          const re = await axios.get(url, { responseType: 'stream' });
+  const re = await axios.get(url, { responseType: 'stream' });
    re.data.path = `${Date.now()}-${url.split('/').pop()}`; 
    return re.data;
         });
@@ -37,7 +36,7 @@ const av = r.data.av;
     }   
     api.sendMessage({ body: result, attachment: attachments }, threadID, messageID);
   } catch (error) {
-    console.error("Error in AI module:", error); 
+    console.error(error.message); 
     api.sendMessage("something went wrong", threadID); 
   }
 };

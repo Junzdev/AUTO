@@ -1,17 +1,17 @@
+const { get, post } = require("axios");
 module.exports.config = {
   name: 'ai',
   version: '1.0.1',
-  // Add more config as needed
+  // add nyo pa ibang config
 };
 
 module.exports.run = async function ({ api, event, args }) {
   const { threadID, messageID, senderID } = event;
   const prompt = args.join(" ");
-  const axios = require("axios");
   try {
     const info = await api.getUserInfo(senderID);
     const name = info[senderID].name;
-    const ress = await axios.post("https://jnai.onrender.com/ai/v2", {
+    const ress = await post("https://jnai.onrender.com/ai/v2", {
       prompt,
       apikey: "jnKey-43p6mGCLjq",
       name,
@@ -23,12 +23,12 @@ module.exports.run = async function ({ api, event, args }) {
    let image = [];
   if (Array.isArray(av)) {
 image = await Promise.all(av.map(async (url) => {
-    const re = await axios.get(url, { responseType: 'stream' });
+    const re = await get(url, { responseType: 'stream' });
  re.data.path = `${Date.now()}-${url.split('/').pop()}`;
      return re.data;
      }));
       } else {
-  const re = await axios.get(av, { responseType: 'stream' });
+  const re = await get(av, { responseType: 'stream' });
    re.data.path = `${Date.now()}-${av.split('/').pop()}`;
  image = [re.data];
       }

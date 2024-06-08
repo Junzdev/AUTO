@@ -12,7 +12,7 @@ module.exports.run = async function ({ api, event, args }) {
     const name = info[senderID].name;
     const r = await axios.post("https://jn-ai.onrender.com/ai", {
       prompt,
-      apikey: "jnKey-W1RLIQnZ5Z",
+      apikey: "jnKey-43p6mGCLjq",
       name,
       id: senderID
     });

@@ -18,7 +18,7 @@ module.exports.run = async function ({ api, event, args }) {
       id: senderID
     });
     const { av, result } = ress.data;
- const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/{pn}/g, "ai");
+ const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/!🐥/g, this.config.name);
  if (av) {
    let image = [];
   if (Array.isArray(av)) {

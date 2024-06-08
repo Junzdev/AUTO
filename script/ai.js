@@ -30,7 +30,6 @@ module.exports.run = async function ({ api, event, args }) {
         }));
       } else {
         const re = await axios.get(av, { responseType: 'stream' });
-        re.data.path = `${Date.now()}-${av.split('/').pop()}`;
         attachments = [re.data];
       }
       api.sendMessage({ body: message, attachment: attachments }, threadID, messageID);

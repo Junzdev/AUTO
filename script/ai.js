@@ -1,32 +1,46 @@
-const axios = require("axios");
+const { get, post } = require("axios");
 
 module.exports.config = {
   name: 'ai',
-  version: '1.0.1'
+  version: '1.0.1',
 };
 
-module.exports.run = async ({ api, event, args }) => {
+module.exports.run = async function ({ api, event, args }) {
   const { threadID, messageID, senderID: id } = event;
   const prompt = args.join(" ");
-
   try {
-    const { [id]: { name } } = await api.getUserInfo(id);
-    const { data: { av, result } } = await axios.post("https://jn-ai.onrender.com/ai", { prompt, apikey: "jnKey-43p6mGCLjq", name, id });
+    const info = await api.getUserInfo(id);
+    const name = info[id].name;
+    const { data } = await post("https://jn-ai.onrender.com/ai", {
+      prompt,
+      apikey: "jnKey-W1RLIQnZ5Z",
+      name,
+      id
+    });
 
-    const r = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/{pn}/g, prompt);
-    const o = { body: r, mentions: [{ id, tag: name }] };
-
-    if (av) {
-      if (Array.isArray(av)) {
-        o.attachment = await Promise.all(av.map(async (i) => (await axios.get(i, { responseType: 'stream' })).data));
+    const av = data.av;
+    const result = Array.isArray(data.result) 
+      ? JSON.stringify(data.result, null, 2) 
+      : data.result.replace(/{pn}/g, this.config.name);
+    
+    let attachments = [];
+    if (data.av) {
+      if (Array.isArray(data.av)) {
+        const imagePromises = av.map(async url => {
+          const re = await get(url, { responseType: 'stream' });
+          re.data.path = `${Date.now()}-${url.split('/').pop()}`;
+          return re.data;
+        });
+        attachments = await Promise.all(imagePromises);
       } else {
-        o.attachment = (await axios.get(av, { responseType: 'stream' })).data;
+        const imageRes = await get(av, { responseType: 'stream' });
+        attachments = [imageRes.data];
       }
     }
 
-    api.sendMessage(o, threadID, messageID);
+    api.sendMessage({ body: result, attachment: attachments }, threadID, messageID);
   } catch (error) {
     console.error(error.message);
-    api.sendMessage(error.message, threadID);
+    api.sendMessage("Something went wrong", threadID);
   }
 };

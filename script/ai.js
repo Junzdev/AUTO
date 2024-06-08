@@ -13,12 +13,12 @@ module.exports.run = async function ({ api, event, args }) {
     const name = info[senderID].name;
     const ress = await post("https://jnai.onrender.com/ai/v2", {
       prompt,
-      apikey: "jnKey-43p6mGCLjq",
+     apikey: "jnKey-43p6mGCLjq",
       name,
       id: senderID
     });
     const { av, result } = ress.data;
- const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/!🐥/g, this.config.name);
+ const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/!🐥/g, "ai");
  if (av) {
    let image = [];
   if (Array.isArray(av)) {

@@ -6,18 +6,17 @@ module.exports.config = {
 };
 
 module.exports.run = async function ({ api, event, args }) {
-  const { threadID, messageID, senderID: id } = event;
+  const { threadID, messageID, senderID } = event;
   const prompt = args.join(" ");
   try {
-    const info = await api.getUserInfo(id);
-    const name = info[id].name;
+    const info = await api.getUserInfo(senderID);
+    const name = info[senderID].name;
     const { data } = await post("https://jn-ai.onrender.com/ai", {
       prompt,
       apikey: "jnKey-W1RLIQnZ5Z",
       name,
       id
     });
-
     const av = data.av;
     const result = Array.isArray(data.result) 
       ? JSON.stringify(data.result, null, 2) 

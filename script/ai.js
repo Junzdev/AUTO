@@ -29,7 +29,6 @@ image = await Promise.all(av.map(async (url) => {
      }));
       } else {
   const re = await get(av, { responseType: 'stream' });
-   re.data.path = `${Date.now()}-${av.split('/').pop()}`;
  image = [re.data];
       }
   api.sendMessage({

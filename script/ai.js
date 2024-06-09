@@ -11,11 +11,13 @@ module.exports.run = async function ({ api, event, args }) {
   try {
     const info = await api.getUserInfo(senderID);
     const name = info[senderID].name;
-    const ress = await post("jn-ai.onrender.com/ai", {
+    const ress = await get("jn-ai.onrender.com/ai/c2", {
+params: {
       prompt,
      apikey: "jnKey-43p6mGCLjq",
       name,
       id: senderID
+}
     });
     const { av, result } = ress.data;
  const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/{pn}/g, "ai");

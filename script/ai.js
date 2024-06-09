@@ -11,7 +11,7 @@ module.exports.run = async function ({ api, event, args }) {
   try {
     const info = await api.getUserInfo(senderID);
     const name = info[senderID].name;
-    const ress = await post("jn-ai.onrender.com/ai/v2", {
+    const ress = await post("jn-ai.onrender.com/ai", {
       prompt,
      apikey: "jnKey-43p6mGCLjq",
       name,

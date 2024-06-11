@@ -1,6 +1,6 @@
 const { get, post } = require("axios");
 module.exports.config = {
-  name: 'ai',
+  name: '?',
   version: '1.0.1',
   // add nyo pa ibang config
 };
@@ -11,16 +11,15 @@ module.exports.run = async function ({ api, event, args }) {
   try {
     const info = await api.getUserInfo(senderID);
     const name = info[senderID].name;
-    const ress = await get("https://jn-ai.onrender.com/ai/v2", {
+    const ress = await get("https://jn-apis.onrender.com/api/gpt", {
 params: {
       prompt,
-     apikey: "jnKey-43p6mGCLjq",
       name,
       id: senderID
 }
     });
     const { av, result } = ress.data;
- const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/{pn}/g, "ai");
+ const res = Array.isArray(result) ? JSON.stringify(result, null, 2) : result.replace(/!🐥/g, "?");
  if (av) {
    let image = [];
   if (Array.isArray(av)) {

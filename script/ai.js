@@ -1,6 +1,6 @@
 const { get, post } = require("axios");
 module.exports.config = {
-  name: '?',
+  name: '',
   version: '1.0.1',
   // add nyo pa ibang config
 };
